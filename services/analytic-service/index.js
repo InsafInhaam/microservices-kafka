@@ -72,7 +72,7 @@ const run = async () => {
     } catch (error) {
       attempts++;
       console.error(
-        `❌ Failed to connect to Kafka (attempt ${attempt}/${maxRetries})`
+        `❌ Failed to connect to Kafka (attempt ${attempts}/${maxRetries})`
       );
       console.error("Error in analytic service:", error);
 
