@@ -1,6 +1,6 @@
-```markdown
 # 🚀 Kafka Microservices Demo
 
+```markdown
 This project demonstrates a **microservices architecture** using **KafkaJS** and **Docker Compose**. It includes the following services:
 
 - ⚙️ Kafka Cluster (3 Brokers - KRaft mode, no Zookeeper)
@@ -10,12 +10,12 @@ This project demonstrates a **microservices architecture** using **KafkaJS** and
 - 📧 Email Service
 - 📈 Analytics Service
 
+```
 ---
 
-## 🧱 Project Structure
+## 🧱 Project 
 
 ```
-
 kafka-microservices-demo/
 ├── docker-compose.yml
 ├── payment-service/
