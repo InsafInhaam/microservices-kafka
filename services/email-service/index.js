@@ -13,33 +13,45 @@ const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "email-service" });
 
 const run = async () => {
-  try {
-    await producer.connect();
-    await consumer.connect();
-    await consumer.subscribe({
-      topic: "order-successful",
-      fromBeginning: true,
-    });
+  let attempts = 0;
+  const maxRetries = 10;
 
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const value = message.value.toString();
-        const { userId, orderId } = JSON.parse(value);
+  while (attempts < maxRetries) {
+    try {
+      await producer.connect();
+      await consumer.connect();
+      await consumer.subscribe({
+        topic: "order-successful",
+        fromBeginning: true,
+      });
 
-        // TODO: Send email to the user
-        const dummyEmailId = "091584203985";
-        console.log(`Email consumer: Email sent to user id ${userId}`);
+      await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const value = message.value.toString();
+          const { userId, orderId } = JSON.parse(value);
 
-        await producer.send({
-          topic: "email-successful",
-          messages: [
-            { value: JSON.stringify({ userId, emailId: dummyEmailId }) },
-          ],
-        });
-      },
-    });
-  } catch (error) {
-    console.log("Error in analytic service:", error);
+          // TODO: Send email to the user
+          const dummyEmailId = "091584203985";
+          console.log(`Email consumer: Email sent to user id ${userId}`);
+
+          await producer.send({
+            topic: "email-successful",
+            messages: [
+              { value: JSON.stringify({ userId, emailId: dummyEmailId }) },
+            ],
+          });
+        },
+      });
+
+      break;
+    } catch (error) {
+      console.log(
+        `❌ Kafka connection attempt ${attempts + 1} failed:`,
+        error.message
+      );
+      attempts++;
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // wait 3s
+    }
   }
 };
 

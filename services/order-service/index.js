@@ -13,33 +13,44 @@ const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "order-service" });
 
 const run = async () => {
-  try {
-    await producer.connect();
-    await consumer.connect();
-    await consumer.subscribe({
-      topic: "payment-successful",
-      fromBeginning: true,
-    });
+  let attempts = 0;
+  const maxRetries = 10;
 
-    await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const value = message.value.toString();
-        const { userId, cart } = JSON.parse(value);
+  while (attempts < maxRetries) {
+    try {
+      await producer.connect();
+      await consumer.connect();
+      await consumer.subscribe({
+        topic: "payment-successful",
+        fromBeginning: true,
+      });
 
-        // TODO: Create order on DB
-        const dummyOrderId = "123456789";
-        console.log(`Order consumer: Order created for user id: ${userId}`);
+      await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const value = message.value.toString();
+          const { userId, cart } = JSON.parse(value);
 
-        await producer.send({
-          topic: "order-successful",
-          messages: [
-            { value: JSON.stringify({ userId, orderId: dummyOrderId }) },
-          ],
-        });
-      },
-    });
-  } catch (err) {
-    console.log(err);
+          // TODO: Create order on DB
+          const dummyOrderId = "123456789";
+          console.log(`Order consumer: Order created for user id: ${userId}`);
+
+          await producer.send({
+            topic: "order-successful",
+            messages: [
+              { value: JSON.stringify({ userId, orderId: dummyOrderId }) },
+            ],
+          });
+        },
+      });
+      break;
+    } catch (error) {
+      console.log(
+        `❌ Kafka connection attempt ${attempts + 1} failed:`,
+        error.message
+      );
+      attempts++;
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // wait 3s
+    }
   }
 };
 
