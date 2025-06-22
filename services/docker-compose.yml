@@ -1,4 +1,5 @@
 services:
+  # Kafka brokers 1
   kafka-broker-1:
     image: bitnami/kafka:latest
     container_name: kafka-broker-1
@@ -12,12 +13,14 @@ services:
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_KRAFT_CLUSTER_ID: X8Y9KJO3R8qRYmoX3C9roQ
-      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_KRAFT_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      ALLOW_PLAINTEXT_LISTENER: "yes"
     ports:
       - "9094:9094"
     networks:
       - kafka-network
+
+  # Kafka brokers 2
   kafka-broker-2:
     image: bitnami/kafka:latest
     container_name: kafka-broker-2
@@ -31,12 +34,14 @@ services:
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_KRAFT_CLUSTER_ID: X8Y9KJO3R8qRYmoX3C9roQ
-      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_KRAFT_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      ALLOW_PLAINTEXT_LISTENER: "yes"
     ports:
       - "9095:9095"
     networks:
       - kafka-network
+
+  # Kafka brokers 3
   kafka-broker-3:
     image: bitnami/kafka:latest
     container_name: kafka-broker-3
@@ -50,12 +55,14 @@ services:
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_KRAFT_CLUSTER_ID: X8Y9KJO3R8qRYmoX3C9roQ
-      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_KRAFT_CLUSTER_ID: 7Dvn0OLMQo-bg4qmCmflVg
+      ALLOW_PLAINTEXT_LISTENER: "yes"
     ports:
       - "9096:9096"
     networks:
       - kafka-network
+
+  # Kafka UI
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -64,14 +71,65 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
       KAFKA_CLUSTERS_0_READONLY: false
       KAFKA_CLUSTERS_0_TOPIC_AUTO_CREATE: true
+    ports:
+      - "8080:8080"
     depends_on:
       - kafka-broker-1
       - kafka-broker-2
       - kafka-broker-3
-    ports:
-      - "8080:8080"
     networks:
       - kafka-network
+
+  # Microservices
+  analytic-service:
+    build: ./analytic-service
+    container_name: analytic-service
+    ports:
+      - "4001:4000"
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+
+  email-service:
+    build: ./email-service
+    container_name: email-service
+    ports:
+      - "4002:4000"
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "4003:4000"
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    environment:
+      - PORT=4004
+    ports:
+      - "4004:4004"
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
 
 networks:
   kafka-network:
