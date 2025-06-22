@@ -9,11 +9,11 @@ This project demonstrates a **microservices architecture** using **KafkaJS** and
 - 📦 Order Service
 - 📧 Email Service
 - 📈 Analytics Service
-
 ```
+
 ---
 
-## 🧱 Project 
+## 🧱 Project
 
 ```
 kafka-microservices-demo/
@@ -24,7 +24,7 @@ kafka-microservices-demo/
 ├── analytic-service/
 └── ...
 
-````
+```
 
 ---
 
@@ -33,9 +33,9 @@ kafka-microservices-demo/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/kafka-microservices-demo.git
-cd kafka-microservices-demo
-````
+git clone https://github.com/InsafInhaam/microservices-kafka.git
+cd microservices-kafka
+```
 
 ---
 
@@ -77,11 +77,11 @@ Each step is event-driven and loosely coupled using Kafka topics.
 
 ## 🛠️ Kafka Setup
 
-* **Image:** Bitnami's `kafka:latest`
-* **Mode:** KRaft (no Zookeeper)
-* **Brokers:** 3 Kafka brokers with IDs 1–3
-* **Ports:** `9094`, `9095`, `9096` mapped externally
-* **Internal Networking:** Each service refers to brokers using hostnames like `kafka-broker-1`
+- **Image:** Bitnami's `kafka:latest`
+- **Mode:** KRaft (no Zookeeper)
+- **Brokers:** 3 Kafka brokers with IDs 1–3
+- **Ports:** `9094`, `9095`, `9096` mapped externally
+- **Internal Networking:** Each service refers to brokers using hostnames like `kafka-broker-1`
 
 ---
 
@@ -95,17 +95,17 @@ All microservices use **KafkaJS** with built-in **retry logic** to avoid crashes
 
 You can inspect Kafka topics, partitions, messages, and consumers using Kafka UI.
 
-* 📍 Open [http://localhost:8080](http://localhost:8080)
+- 📍 Open [http://localhost:8080](http://localhost:8080)
 
 ---
 
 ## 📦 Tech Stack
 
-* **Node.js** + **Express.js** for services
-* **KafkaJS** for Kafka client in Node.js
-* **Docker Compose** for orchestrating services
-* **Bitnami Kafka** for a KRaft-based Kafka cluster
-* **Kafka UI** by Provectus
+- **Node.js** + **Express.js** for services
+- **KafkaJS** for Kafka client in Node.js
+- **Docker Compose** for orchestrating services
+- **Bitnami Kafka** for a KRaft-based Kafka cluster
+- **Kafka UI** by Provectus
 
 ---
 
@@ -131,19 +131,19 @@ You should see logs from all services as they receive and process Kafka messages
 
 ## 🐳 Docker Tips
 
-* **Stop all containers:**
+- **Stop all containers:**
 
   ```bash
   docker compose down
   ```
 
-* **Rebuild everything:**
+- **Rebuild everything:**
 
   ```bash
   docker compose up --build
   ```
 
-* **View real-time logs:**
+- **View real-time logs:**
 
   ```bash
   docker compose logs -f
